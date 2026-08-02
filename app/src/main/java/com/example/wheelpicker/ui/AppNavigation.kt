@@ -8,6 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.wheelpicker.data.OptionRepository
+import com.example.wheelpicker.ui.backdoor.BackdoorPasswordScreen
 import com.example.wheelpicker.ui.backdoor.BackdoorScreen
 import com.example.wheelpicker.ui.backdoor.BackdoorViewModel
 import com.example.wheelpicker.ui.edit.EditScreen
@@ -45,7 +46,19 @@ fun AppNavigation(repository: OptionRepository) {
 
         composable("backdoor") {
             val viewModel: BackdoorViewModel = viewModel(factory = backdoorFactory(repository))
-            BackdoorScreen(viewModel = viewModel, onBack = { navController.popBackStack() })
+            BackdoorScreen(
+                viewModel = viewModel,
+                onBack = { navController.popBackStack() },
+                onOpenPassword = { navController.navigate("backdoor_password") },
+            )
+        }
+
+        composable("backdoor_password") {
+            val viewModel: BackdoorViewModel = viewModel(factory = backdoorFactory(repository))
+            BackdoorPasswordScreen(
+                viewModel = viewModel,
+                onBack = { navController.popBackStack() },
+            )
         }
     }
 }
