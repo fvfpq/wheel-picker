@@ -14,9 +14,21 @@ class BackdoorViewModel(private val repository: OptionRepository) : ViewModel() 
     val config: StateFlow<WheelConfig> = repository.config
         .stateIn(viewModelScope, SharingStarted.Eagerly, WheelConfig())
 
-    fun forceNext(optionId: String?) {
+    fun enqueue(optionId: String) {
         viewModelScope.launch {
-            repository.setForcedOption(optionId)
+            repository.enqueueForcedOption(optionId)
+        }
+    }
+
+    fun removeAt(optionId: String) {
+        viewModelScope.launch {
+            repository.removeForcedOption(optionId)
+        }
+    }
+
+    fun clearAll() {
+        viewModelScope.launch {
+            repository.clearForcedOptions()
         }
     }
 

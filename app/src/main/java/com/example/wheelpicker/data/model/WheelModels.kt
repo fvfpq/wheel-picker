@@ -19,9 +19,16 @@ data class WheelConfig(
     val options: List<WheelOption> = defaultOptions(),
     val password: String = DEFAULT_PASSWORD,
     val forcedOptionId: String? = null,
+    val forcedQueue: List<String> = emptyList(),
 ) {
-    fun normalized(): WheelConfig =
-        copy(options = options.map { it.normalized() })
+    fun normalized(): WheelConfig {
+        val validIds = options.map { it.id }.toSet()
+        var queue = forcedQueue.filter { it in validIds }
+        if (queue.isEmpty() && forcedOptionId != null && forcedOptionId in validIds) {
+            queue = listOf(forcedOptionId)
+        }
+        return copy(options = options.map { it.normalized() }, forcedQueue = queue)
+    }
 }
 
 @Serializable

@@ -50,7 +50,7 @@ class WheelModelsTest {
                 WheelOption(label = "乙", color = 0xFF445566, weight = 30),
             ),
             password = "1234",
-            forcedOptionId = "some-id",
+            forcedQueue = listOf("id-1", "id-1", "id-2"),
         )
         val encoded = json.encodeToString(WheelConfig.serializer(), original)
         val decoded = json.decodeFromString(WheelConfig.serializer(), encoded)
@@ -62,7 +62,46 @@ class WheelModelsTest {
         val decoded = json.decodeFromString(WheelConfig.serializer(), """{"options":[]}""")
         assertEquals(0, decoded.options.size)
         assertEquals(DEFAULT_PASSWORD, decoded.password)
-        assertEquals(null, decoded.forcedOptionId)
+        assertEquals(emptyList<String>(), decoded.forcedQueue)
+    }
+
+    @Test
+    fun `normalized keeps queue order and duplicates`() {
+        val a = WheelOption(label = "甲", color = 0xFF000000)
+        val b = WheelOption(label = "乙", color = 0xFF000000)
+        val config = WheelConfig(options = listOf(a, b), forcedQueue = listOf(a.id, b.id, a.id))
+        val normalized = config.normalized()
+        assertEquals(listOf(a.id, b.id, a.id), normalized.forcedQueue)
+    }
+
+    @Test
+    fun `normalized drops queue entries for deleted options`() {
+        val a = WheelOption(label = "甲", color = 0xFF000000)
+        val b = WheelOption(label = "乙", color = 0xFF000000)
+        val config = WheelConfig(options = listOf(a), forcedQueue = listOf(a.id, b.id))
+        val normalized = config.normalized()
+        assertEquals(listOf(a.id), normalized.forcedQueue)
+    }
+
+    @Test
+    fun `legacy forcedOptionId migrates to queue`() {
+        val a = WheelOption(label = "甲", color = 0xFF000000)
+        val legacy = WheelConfig(options = listOf(a), forcedOptionId = a.id, forcedQueue = emptyList())
+        val normalized = legacy.normalized()
+        assertEquals(listOf(a.id), normalized.forcedQueue)
+    }
+
+    @Test
+    fun `legacy forcedOptionId ignored when queue already present`() {
+        val a = WheelOption(label = "甲", color = 0xFF000000)
+        val b = WheelOption(label = "乙", color = 0xFF000000)
+        val legacy = WheelConfig(
+            options = listOf(a, b),
+            forcedOptionId = a.id,
+            forcedQueue = listOf(b.id),
+        )
+        val normalized = legacy.normalized()
+        assertEquals(listOf(b.id), normalized.forcedQueue)
     }
 
     @Test

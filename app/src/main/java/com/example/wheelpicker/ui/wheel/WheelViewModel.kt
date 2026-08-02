@@ -78,7 +78,8 @@ class WheelViewModel(private val repository: OptionRepository) : ViewModel() {
         try {
             _isSpinning.value = true
             _resultLabel.value = null
-            val target = engine.computeTargetRotation(cfg.options, cfg.forcedOptionId, rotation.value)
+            val forcedId = cfg.forcedQueue.firstOrNull()
+            val target = engine.computeTargetRotation(cfg.options, forcedId, rotation.value)
             val turns = ((target - rotation.value) / 360f).toInt().coerceAtLeast(4)
             rotation.animateTo(
                 targetValue = target,
@@ -93,8 +94,8 @@ class WheelViewModel(private val repository: OptionRepository) : ViewModel() {
             rotation.snapTo(final)
             val selected = engine.selectedOption(cfg.options, rotation.value)
             _resultLabel.value = selected.label
-            if (cfg.forcedOptionId != null) {
-                repository.setForcedOption(null)
+            if (cfg.forcedQueue.isNotEmpty()) {
+                repository.consumeForcedHead()
             }
             repository.addRecord(
                 SpinRecord(optionId = selected.id, label = selected.label, timestamp = System.currentTimeMillis())

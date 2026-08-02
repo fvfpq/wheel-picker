@@ -48,9 +48,14 @@ class OptionRepository(private val context: Context) {
     suspend fun updateOptions(options: List<WheelOption>) {
         context.dataStore.edit { prefs ->
             val current = decode(prefs[keys.CONFIG_JSON])
+            val validIds = options.map { it.id }.toSet()
+            val queue = current.forcedQueue.filter { it in validIds }
             prefs[keys.CONFIG_JSON] = json.encodeToString(
                 WheelConfig.serializer(),
-                current.copy(options = options.map { it.normalized() }).normalized()
+                current.copy(
+                    options = options.map { it.normalized() },
+                    forcedQueue = queue,
+                ).normalized()
             )
         }
     }
@@ -70,7 +75,53 @@ class OptionRepository(private val context: Context) {
             val current = decode(prefs[keys.CONFIG_JSON])
             prefs[keys.CONFIG_JSON] = json.encodeToString(
                 WheelConfig.serializer(),
-                current.copy(forcedOptionId = optionId).normalized()
+                if (optionId == null) {
+                    current.copy(forcedQueue = emptyList()).normalized()
+                } else {
+                    current.copy(forcedQueue = listOf(optionId)).normalized()
+                }
+            )
+        }
+    }
+
+    suspend fun enqueueForcedOption(optionId: String) {
+        context.dataStore.edit { prefs ->
+            val current = decode(prefs[keys.CONFIG_JSON])
+            prefs[keys.CONFIG_JSON] = json.encodeToString(
+                WheelConfig.serializer(),
+                current.copy(forcedQueue = current.forcedQueue + optionId).normalized()
+            )
+        }
+    }
+
+    suspend fun removeForcedOption(optionId: String) {
+        context.dataStore.edit { prefs ->
+            val current = decode(prefs[keys.CONFIG_JSON])
+            val index = current.forcedQueue.indexOfFirst { it == optionId }
+            val queue = if (index >= 0) current.forcedQueue.toMutableList().apply { removeAt(index) } else current.forcedQueue
+            prefs[keys.CONFIG_JSON] = json.encodeToString(
+                WheelConfig.serializer(),
+                current.copy(forcedQueue = queue).normalized()
+            )
+        }
+    }
+
+    suspend fun clearForcedOptions() {
+        context.dataStore.edit { prefs ->
+            val current = decode(prefs[keys.CONFIG_JSON])
+            prefs[keys.CONFIG_JSON] = json.encodeToString(
+                WheelConfig.serializer(),
+                current.copy(forcedQueue = emptyList()).normalized()
+            )
+        }
+    }
+
+    suspend fun consumeForcedHead() {
+        context.dataStore.edit { prefs ->
+            val current = decode(prefs[keys.CONFIG_JSON])
+            prefs[keys.CONFIG_JSON] = json.encodeToString(
+                WheelConfig.serializer(),
+                current.copy(forcedQueue = current.forcedQueue.drop(1)).normalized()
             )
         }
     }
