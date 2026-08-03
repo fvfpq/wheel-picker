@@ -15,6 +15,7 @@ import com.example.wheelpicker.ui.edit.EditScreen
 import com.example.wheelpicker.ui.edit.EditViewModel
 import com.example.wheelpicker.ui.history.HistoryScreen
 import com.example.wheelpicker.ui.history.HistoryViewModel
+import com.example.wheelpicker.ui.settings.SettingsScreen
 import com.example.wheelpicker.ui.wheel.WheelScreen
 import com.example.wheelpicker.ui.wheel.WheelViewModel
 
@@ -31,6 +32,7 @@ fun AppNavigation(repository: OptionRepository) {
                 onOpenEdit = { navController.navigate("edit") },
                 onOpenHistory = { navController.navigate("history") },
                 onOpenBackdoor = { navController.navigate("backdoor") },
+                onOpenSettings = { navController.navigate("settings") },
             )
         }
 
@@ -59,6 +61,10 @@ fun AppNavigation(repository: OptionRepository) {
                 viewModel = viewModel,
                 onBack = { navController.popBackStack() },
             )
+        }
+
+        composable("settings") {
+            SettingsScreen(onBack = { navController.popBackStack() })
         }
     }
 }

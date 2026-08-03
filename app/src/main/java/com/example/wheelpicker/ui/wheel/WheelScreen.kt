@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.History
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -38,6 +39,7 @@ fun WheelScreen(
     onOpenEdit: () -> Unit,
     onOpenHistory: () -> Unit,
     onOpenBackdoor: () -> Unit,
+    onOpenSettings: () -> Unit,
 ) {
     val config by viewModel.config.collectAsState()
     val isSpinning by viewModel.isSpinning.collectAsState()
@@ -66,6 +68,9 @@ fun WheelScreen(
                     actions = {
                         IconButton(onClick = onOpenHistory) {
                             Icon(Icons.Outlined.History, contentDescription = "历史记录")
+                        }
+                        IconButton(onClick = onOpenSettings) {
+                            Icon(Icons.Outlined.Settings, contentDescription = "设置")
                         }
                     },
                 )
