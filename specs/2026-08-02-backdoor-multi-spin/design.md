@@ -102,7 +102,7 @@ data class WheelConfig(
 
 ## References
 
-[^1]: (.monkeycode/specs/2026-08-02-backdoor-multi-spin/requirements.md) - 需求文档
+[^1]: (specs/2026-08-02-backdoor-multi-spin/requirements.md) - 需求文档
 [^2]: (app/src/main/java/com/example/wheelpicker/data/model/WheelModels.kt) - 数据模型
 [^3]: (app/src/main/java/com/example/wheelpicker/domain/SpinEngine.kt) - 领域引擎
 [^4]: (app/src/main/java/com/example/wheelpicker/ui/backdoor/BackdoorScreen.kt) - 后台界面
